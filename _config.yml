@@ -1,9 +1,9 @@
-title: "jekyll-shell-theme"
+title: "Train Graffiti"
 tagline: "A jekyll theme that looks like a shell/terminal"
-description: "This is a preview of jekyll-shell-theme."
-github_username: tareqdandachi
-baseurl: "/jekyll-shell-theme"
-url: "https://tareqdandachi.github.io"
+description: "A small train project for fun, all train graffiti images."
+github_username: C0DE33301
+baseurl: "/Train-Graffiti"
+url: "https://C0DE33301.github.io"
 
 plugins:
   - jemoji
@@ -17,7 +17,7 @@ highlighter: rouge
 
 header_pages:
   - index.md
-  - read-me.md
+  - slideshow.md
   - preview.md
 
 # set the size of the text to 'large' or 'small', default is small
