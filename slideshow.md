@@ -17,7 +17,7 @@ title: My Slideshow
 <div class="slideshow-container" id="slideshow">
     <!-- austin Slides -->
     {% for image in site.static_files %}
-      {% if image.path contains 'assets/images/texas/austin/oct52025/' %}
+      {% if image.path contains 'assets/images/texas/austin/' %}
           <div class="mySlides fade" data-category="austin">
               <img src="{{ image.path | relative_url }}" style="width:100%">
               <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
@@ -27,7 +27,7 @@ title: My Slideshow
 
     <!-- dallas Slides -->
     {% for image in site.static_files %}
-      {% if image.path contains 'assets/images/texas/austin/test2/' %}
+      {% if image.path contains 'assets/images/texas/dallas/' %}
           <div class="mySlides fade" data-category="dallas" style="display:none;">
               <img src="{{ image.path | relative_url }}" style="width:100%">
               <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
@@ -37,7 +37,7 @@ title: My Slideshow
 
     <!-- fortworth Slides -->
     {% for image in site.static_files %}
-      {% if image.path contains 'assets/images/texas/austin/test3/' %}
+      {% if image.path contains 'assets/images/texas/fortworth/' %}
           <div class="mySlides fade" data-category="fortworth" style="display:none;">
               <img src="{{ image.path | relative_url }}" style="width:100%">
               <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
