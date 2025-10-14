@@ -9,36 +9,36 @@ title: My Slideshow
 
 <p>Texas</p>
 <div class="button-container">
-    <button onclick="showCategory('dots')">Austin</button>
-    <button onclick="showCategory('strips')">Other, ...</button>
-    <button onclick="showCategory('zags')">Other, ...</button>
+    <button onclick="showCategory('austin')">Austin</button>
+    <button onclick="showCategory('dallas')">Dallas</button>
+    <button onclick="showCategory('fortworth')">Fort Worth</button>
 </div>
 
 <div class="slideshow-container" id="slideshow">
-    <!-- Dots Slides -->
+    <!-- austin Slides -->
     {% for image in site.static_files %}
       {% if image.path contains 'assets/images/texas/austin/oct52025/' %}
-          <div class="mySlides fade" data-category="dots">
+          <div class="mySlides fade" data-category="austin">
               <img src="{{ image.path | relative_url }}" style="width:100%">
               <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
           </div>
       {% endif %}
     {% endfor %}
 
-    <!-- Strips Slides -->
+    <!-- dallas Slides -->
     {% for image in site.static_files %}
       {% if image.path contains 'assets/images/texas/austin/test2/' %}
-          <div class="mySlides fade" data-category="strips" style="display:none;">
+          <div class="mySlides fade" data-category="dallas" style="display:none;">
               <img src="{{ image.path | relative_url }}" style="width:100%">
               <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
           </div>
       {% endif %}
     {% endfor %}
 
-    <!-- Zags Slides -->
+    <!-- fortworth Slides -->
     {% for image in site.static_files %}
       {% if image.path contains 'assets/images/texas/austin/test3/' %}
-          <div class="mySlides fade" data-category="zags" style="display:none;">
+          <div class="mySlides fade" data-category="fortworth" style="display:none;">
               <img src="{{ image.path | relative_url }}" style="width:100%">
               <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
           </div>
@@ -139,7 +139,7 @@ title: My Slideshow
 
     function showSlides(n) {
         const slides = document.getElementsByClassName("mySlides");
-        const dots = document.getElementsByClassName("dot");
+        const austin = document.getElementsByClassName("dot");
         
         // Cycle through slides
         if (n > slides.length) { slideIndex = 1; }
@@ -150,15 +150,15 @@ title: My Slideshow
             slides[i].style.display = "none";  
         }
 
-        // Remove active class from all dots
-        for (let i = 0; i < dots.length; i++) {
-            dots[i].className = dots[i].className.replace(" active", "");
+        // Remove active class from all austin
+        for (let i = 0; i < austin.length; i++) {
+            austin[i].className = austin[i].className.replace(" active", "");
         }
 
         // Show the current slide and set the active dot
         const currentSlides = Array.from(slides).filter(slide => slide.dataset.category === currentCategory);
         currentSlides[slideIndex - 1].style.display = "block";  
-        dots[slideIndex - 1].className += " active";
+        austin[slideIndex - 1].className += " active";
     }
 
     // Initialize the display for the default category
