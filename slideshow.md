@@ -5,21 +5,45 @@ permalink_name: /slideshow
 title: My Slideshow
 ---
 
-<div class="slideshow-container">
-    <div class="mySlides fade">
-        <img src="path/to/image1.jpg" style="width:100%">
-        <div class="text">Caption Text 1</div>
-    </div>
+<!-- Show JPG Images!!! -->
 
-    <div class="mySlides fade">
-        <img src="path/to/image2.jpg" style="width:100%">
-        <div class="text">Caption Text 2</div>
-    </div>
+<p>Texas</p>
+<div class="button-container">
+    <button onclick="showCategory('dots')">Austin</button>
+    <button onclick="showCategory('strips')">Other, ...</button>
+    <button onclick="showCategory('zags')">Other, ...</button>
+</div>
 
-    <div class="mySlides fade">
-        <img src="path/to/image3.jpg" style="width:100%">
-        <div class="text">Caption Text 3</div>
-    </div>
+<div class="slideshow-container" id="slideshow">
+    <!-- Dots Slides -->
+    {% for image in site.static_files %}
+      {% if image.path contains 'assets/images/texas/austin/oct52025/' %}
+          <div class="mySlides fade" data-category="dots">
+              <img src="{{ image.path | relative_url }}" style="width:100%">
+              <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
+          </div>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Strips Slides -->
+    {% for image in site.static_files %}
+      {% if image.path contains 'assets/images/texas/austin/test2/' %}
+          <div class="mySlides fade" data-category="strips" style="display:none;">
+              <img src="{{ image.path | relative_url }}" style="width:100%">
+              <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
+          </div>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Zags Slides -->
+    {% for image in site.static_files %}
+      {% if image.path contains 'assets/images/texas/austin/test3/' %}
+          <div class="mySlides fade" data-category="zags" style="display:none;">
+              <img src="{{ image.path | relative_url }}" style="width:100%">
+              <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' }}</div>
+          </div>
+      {% endif %}
+    {% endfor %}
 
     <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
     <a class="next" onclick="plusSlides(1)">&#10095;</a>
@@ -27,13 +51,13 @@ title: My Slideshow
 
 <br>
 
-<div style="text-align:center">
-    <span class="dot" onclick="currentSlide(1)"></span> 
-    <span class="dot" onclick="currentSlide(2)"></span> 
-    <span class="dot" onclick="currentSlide(3)"></span> 
-</div>
-
 <style>
+    .button-container {
+        display: flex;  /* Use flexbox for horizontal layout */
+        justify-content: center; /* Center the buttons */
+        margin-bottom: 20px; /* Space below the button container */
+    }
+
     .slideshow-container {
         position: relative;
         max-width: 100%;
@@ -73,25 +97,37 @@ title: My Slideshow
         text-align: center;
     }
 
-    .dot {
+    button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 16px;
         cursor: pointer;
-        height: 15px;
-        width: 15px;
-        margin: 0 2px;
-        background-color: #bbb;
-        border-radius: 50%;
-        display: inline-block;
-        transition: background-color 0.6s ease;
+        background-color: black; /* White background */
+        color: white; /* Black text */
+        border: 2px solid white; /* Black border */
+        border-radius: 5px; /* Rounded corners */
+        transition: background-color 0.3s, color 0.3s; /* Smooth transition */
     }
 
-    .active, .dot:hover {
-        background-color: #717171;
+    button:hover {
+        background-color: white; /* Black background on hover */
+        color: black; /* White text on hover */
     }
 </style>
 
 <script>
     let slideIndex = 1;
-    showSlides(slideIndex);
+    let currentCategory = 'cats';
+
+    function showCategory(category) {
+        currentCategory = category;
+        slideIndex = 1;
+        const slides = document.getElementsByClassName("mySlides");
+        Array.from(slides).forEach(slide => {
+            slide.style.display = slide.dataset.category === category ? "block" : "none";
+        });
+        showSlides(slideIndex);
+    }
 
     function plusSlides(n) {
         showSlides(slideIndex += n);
@@ -102,18 +138,29 @@ title: My Slideshow
     }
 
     function showSlides(n) {
-        let i;
         const slides = document.getElementsByClassName("mySlides");
         const dots = document.getElementsByClassName("dot");
-        if (n > slides.length) {slideIndex = 1}
-        if (n < 1) {slideIndex = slides.length}
-        for (i = 0; i < slides.length; i++) {
+        
+        // Cycle through slides
+        if (n > slides.length) { slideIndex = 1; }
+        if (n < 1) { slideIndex = slides.length; }
+
+        // Hide all slides
+        for (let i = 0; i < slides.length; i++) {
             slides[i].style.display = "none";  
         }
-        for (i = 0; i < dots.length; i++) {
+
+        // Remove active class from all dots
+        for (let i = 0; i < dots.length; i++) {
             dots[i].className = dots[i].className.replace(" active", "");
         }
-        slides[slideIndex-1].style.display = "block";  
-        dots[slideIndex-1].className += " active";
+
+        // Show the current slide and set the active dot
+        const currentSlides = Array.from(slides).filter(slide => slide.dataset.category === currentCategory);
+        currentSlides[slideIndex - 1].style.display = "block";  
+        dots[slideIndex - 1].className += " active";
     }
+
+    // Initialize the display for the default category
+    showCategory('cats');
 </script>
