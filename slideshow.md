@@ -2,7 +2,7 @@
 layout: default
 permalink: /slideshow
 permalink_name: /Slideshow
-title: States → Cities
+title: Slideshow
 ---
 
 <nav class="breadcrumb" id="breadcrumb">
@@ -34,7 +34,6 @@ title: States → Cities
             <div class="mySlides fade" data-city="{{ city_key }}" style="display:none;">
                 <img src="{{ image.path | relative_url }}" style="width:100%">
                 {% comment %} Use the image name for the text caption {% endcomment %}
-                <div class="text">{{ image.name | split: '/' | last | remove: '.jpg' | remove: '.png' | remove: '.gif' }}</div>
             </div>
         {% endif %}
     {% endfor %}
@@ -42,41 +41,35 @@ title: States → Cities
 </div>
 
 <script>
+const data = [
+  {"Texas": ["Austin", "Dallas", "Fort Worth"]}
+];
+
 // Helper function to create a URL-friendly key from the city name
 function createCityKey(cityName) {
     return cityName.toLowerCase().replace(/\s/g, '');
 }
 
-// 2. SIMPLIFIED DATA STRUCTURE (Client-side JavaScript)
-const data = {
-  states: {
-    california: {
-      label: "California",
-      cities: [
-        "Los Angeles",
-        "San Francisco",
-        "San Diego"
-      ]
-    },
-    texas: {
-      label: "Texas",
-      cities: [
-        "Houston",
-        "Austin",
-        "Dallas",
-        "Fort Worth"
-      ]
-    },
-    newyork: {
-      label: "New York",
-      cities: [
-        "New York City",
-        "Buffalo",
-        "Rochester"
-      ]
-    }
-  }
-};
+// NEW HELPER: Helper function to create a URL-friendly key from the state name
+function createStateKey(stateName) {
+    return stateName.toLowerCase().replace(/\s/g, '');
+}
+
+// NEW HELPER: Function to find state data from the array using the URL key
+function findStateData(stateKey) {
+  const stateObject = data.find(obj => {
+    const stateName = Object.keys(obj)[0];
+    return createStateKey(stateName) === stateKey;
+  });
+
+  if (!stateObject) return null;
+
+  const stateLabel = Object.keys(stateObject)[0];
+  const cities = stateObject[stateLabel];
+
+  return { stateLabel, cities, stateKey };
+}
+
 
 /* -------------------- DOM refs -------------------- */
 const breadcrumbEl = document.getElementById('breadcrumb');
@@ -93,7 +86,7 @@ function setBreadcrumb(parts) {
     if (i < parts.length - 1) {
       const sep = document.createElement('span');
       sep.className = 'sep';
-      sep.textContent = '>';
+      sep.textContent = ' > ';
       breadcrumbEl.appendChild(sep);
     }
   });
@@ -113,14 +106,20 @@ function navigate(path) {
 function showStates() {
   setBreadcrumb([{ key: 'states', label: 'States' }]);
   const ul = document.createElement('ul');
-  for (const sKey of Object.keys(data.states)) {
+  
+  // FIX: Iterate over the array directly
+  data.forEach(stateObject => {
+    const stateLabel = Object.keys(stateObject)[0];
+    const sKey = createStateKey(stateLabel);
+    
     const li = document.createElement('li');
     const a  = document.createElement('a');
-    a.textContent = data.states[sKey].label;
+    a.textContent = stateLabel; 
     a.onclick = () => navigate(sKey);
     li.appendChild(a);
     ul.appendChild(li);
-  }
+  });
+  
   contentEl.innerHTML = '';
   const card = document.createElement('div'); card.className = 'card';
   card.append(ul);
@@ -128,15 +127,18 @@ function showStates() {
 }
 
 function showState(stateKey) {
-  const state = data.states[stateKey];
-  if (!state) return showStates();
+  // FIX: Use the new helper function
+  const state = findStateData(stateKey);
+  
+  if (!state) return showStates(); // Not found
+
   setBreadcrumb([
     { key: 'states', label: 'States' },
-    { key: stateKey, label: state.label }
+    { key: state.stateKey, label: state.stateLabel }
   ]);
   const ul = document.createElement('ul');
   
-  // Logic now assumes state.cities is always an ARRAY
+  // Logic uses the 'state' object returned from findStateData
   state.cities.forEach(cityName => {
     const cKey = createCityKey(cityName); 
     const li = document.createElement('li');
@@ -154,28 +156,24 @@ function showState(stateKey) {
 }
 
 function showCity(stateKey, cityKey) {
-  const state = data.states[stateKey];
-  if (!state) return showStates();
+  // FIX: Use the new helper function
+  const state = findStateData(stateKey);
   
-  // Find the original city name in the array that matches the generated cityKey
+  if (!state) return showStates(); // State not found
+  
+  // Find the original city name in the array
   const cityLabel = state.cities.find(name => createCityKey(name) === cityKey);
   
-  if (!cityLabel) return showState(stateKey); // Not found
-
-  // Set a generic description since the 'text' property was removed
-  const cityText = `You are viewing the details for ${cityLabel}, one of the major cities in ${state.label}.`;
+  if (!cityLabel) return showState(stateKey); // City not found
 
   setBreadcrumb([
     { key: 'states', label: 'States' },
-    { key: stateKey, label: state.label },
+    { key: state.stateKey, label: state.stateLabel },
     { key: `${stateKey}/${cityKey}`, label: cityLabel }
   ]);
-  
+
   contentEl.innerHTML = '';
   const card = document.createElement('div'); card.className = 'card';
-  const h = document.createElement('h2'); h.textContent = `${cityLabel}, ${state.label}`;
-  const p = document.createElement('p'); p.textContent = cityText;
-  card.append(h, p);
   contentEl.appendChild(card);
 
   // --- GENERIC SLIDESHOW LOGIC ---
@@ -196,40 +194,40 @@ function showCity(stateKey, cityKey) {
       contentEl.appendChild(slideshowWrapper);
 
       // --- Slideshow Initialization (Generic) ---
-      (function() {
-          let slideIndex = 1; 
-          const slides = slideshowWrapper.getElementsByClassName('mySlides');
+      let slideIndex = 1; 
+      const slides = slideshowWrapper.getElementsByClassName('mySlides');
 
-          function showSlides(n) {
-            if (slides.length === 0) return; 
+      function showSlides(n) {
+        if (slides.length === 0) return; 
 
-            if (n > slides.length) slideIndex = 1;
-            if (n < 1) slideIndex = slides.length;
+        if (n > slides.length) slideIndex = 1;
+        if (n < 1) slideIndex = slides.length;
 
-            Array.from(slides).forEach(s => s.style.display = 'none');
-            // Make the current slide visible
-            slides[slideIndex - 1].style.display = 'block';
-          }
+        Array.from(slides).forEach(s => s.style.display = 'none');
+        // Make the current slide visible
+        slides[slideIndex - 1].style.display = 'block';
+      }
 
-          function plusSlides(n) {
-            showSlides(slideIndex += n);
-          }
-          
-          // 3. Dynamically create buttons
-          const prevA = document.createElement('a');
-          prevA.className = 'prev';
-          prevA.innerHTML = '&#10094;';
-          prevA.onclick = () => plusSlides(-1); 
-          slideshowWrapper.appendChild(prevA);
+      function plusSlides(n) {
+        showSlides(slideIndex += n);
+      }
+      
+      // 3. Dynamically create buttons
+      const prevA = document.createElement('a');
+      prevA.className = 'prev';
+      prevA.innerHTML = '&#10094;';
+      prevA.onclick = () => plusSlides(-1); 
+      prevA.style.padding = "10px";
+      slideshowWrapper.appendChild(prevA);
 
-          const nextA = document.createElement('a');
-          nextA.className = 'next';
-          nextA.innerHTML = '&#10095;';
-          nextA.onclick = () => plusSlides(1); 
-          slideshowWrapper.appendChild(nextA);
-          
-          showSlides(slideIndex);
-      })();
+      const nextA = document.createElement('a');
+      nextA.className = 'next';
+      nextA.innerHTML = '&#10095;';
+      nextA.onclick = () => plusSlides(1); 
+      nextA.style.padding = "10px";
+      slideshowWrapper.appendChild(nextA);
+      
+      showSlides(slideIndex);
   }
 }
 
